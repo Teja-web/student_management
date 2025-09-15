@@ -1,0 +1,39 @@
+pipeline {
+    agent any
+    
+    stages {
+        stage('Checkout') {
+            steps {
+                git branch: 'main', url: 'https://github.com/Teja-web/student_management.git'
+            }
+        }
+        
+        stage('Setup Python') {
+            steps {
+                sh 'python3 --version'
+                sh 'pip3 --version'
+            }
+        }
+        
+        stage('Run Python Files') {
+            steps {
+                sh 'python3 student.py'
+                sh 'python3 login.py'
+                sh 'python3 marks.py'
+                sh 'python3 attendance.py'
+            }
+        }
+    }
+    
+    post {
+        always {
+            echo 'Pipeline completed'
+        }
+        success {
+            echo 'All Python files executed successfully'
+        }
+        failure {
+            echo 'Pipeline failed'
+        }
+    }
+}
