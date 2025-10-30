@@ -1,39 +1,34 @@
 pipeline {
-    agent any
-    
+    agent none
+
     stages {
-        stage('Checkout') {
+        stage('Controller Stage') {
+            agent { label 'built-in' }
             steps {
-                git branch: 'main', url: 'https://github.com/Teja-web/student_management.git'
+                echo "Running on CONTROLLER"
             }
         }
-        
-        stage('Setup Python') {
+        stage('Windows Agent Stage') {
+            agent { label 'win' }
             steps {
-                bat 'python --version'
-                bat 'pip --version'
+                bat '''echo Running on AGENT'''
             }
         }
-        
-        stage('Run Python Files') {
-            steps {
-                bat 'python student.py'
-                bat 'python login.py'
-                bat 'python marks.py'
-                bat 'python attendance.py'
+        stage('Parallel Test') {
+            parallel {
+                stage('Controller Lane') {
+                    agent { label 'built-in' }
+                    steps {
+                        echo "Hello from CONTROLLER in parallel"
+                    }
+                }
+                stage('Agent Lane') {
+                    agent { label 'win' }
+                    steps {
+                        bat "echo Hello from AGENT in parallel"
+                    }
+                }
             }
-        }
-    }
-    
-    post {
-        always {
-            echo 'Pipeline completed'
-        }
-        success {
-            echo 'All Python files executed successfully'
-        }
-        failure {
-            echo 'Pipeline failed'
         }
     }
 }
